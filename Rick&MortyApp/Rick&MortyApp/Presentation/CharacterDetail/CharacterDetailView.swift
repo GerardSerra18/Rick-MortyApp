@@ -22,6 +22,7 @@ struct CharacterDetailView: View {
         content
             .navigationBarTitleDisplayMode(.inline)
             .portalBackground()
+            .transparentNavBar()
             .onAppear { viewModel.onAppear() }
     }
 }
@@ -34,6 +35,7 @@ private extension CharacterDetailView {
         case .loading:
             ProgressView("Loading...")
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .foregroundColor(.white)
             
         case .error(let msg):
             VStack(spacing: 10) {

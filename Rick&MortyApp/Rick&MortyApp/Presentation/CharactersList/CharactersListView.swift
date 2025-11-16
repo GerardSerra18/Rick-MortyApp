@@ -20,13 +20,6 @@ struct CharactersListView: View {
         NavigationStack {
             content
                 .navigationBarTitleDisplayMode(.inline)
-                .toolbar {
-                    ToolbarItem(placement: .principal) {
-                        Text("Characters")
-                            .font(.headline.bold())
-                            .foregroundColor(.white)
-                    }
-                }
                 .portalBackground()
         }
         .refreshable {
@@ -47,6 +40,12 @@ private extension CharactersListView {
     var content: some View {
         ScrollView {
             VStack(spacing: 20) {
+                
+                Text("Characters")
+                    .font(.system(size: 34, weight: .black))
+                    .foregroundColor(.white)
+                    .shadow(color: .cyan.opacity(0.4), radius: 6)
+                    .padding(.top, 6)
                 
                 SearchBar(text: $viewModel.searchText)
                     .padding(.top, 4)
@@ -79,14 +78,17 @@ private extension CharactersListView {
     var loadingView: some View {
         ProgressView("Loading...")
             .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .foregroundColor(.white)
     }
     
     var emptyView: some View {
         VStack(spacing: 12) {
             Text("No characters found")
                 .font(.headline)
+                .foregroundColor(.white)
             Text("Try another search term")
                 .foregroundColor(.secondary)
+                .foregroundColor(.white)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
@@ -95,9 +97,11 @@ private extension CharactersListView {
         VStack(spacing: 12) {
             Text(message)
                 .font(.headline)
+                .foregroundColor(.white)
             Button("Retry") {
                 viewModel.onAppear()
             }
+            .foregroundColor(.white)
             .padding(.top, 4)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
