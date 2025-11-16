@@ -22,7 +22,7 @@ struct CharactersListView: View {
                 .navigationTitle("Characters")
         }
         .searchable(text: $viewModel.searchText, prompt: "Search by name")
-        .onChange(of: viewModel.searchText) { _ in
+        .onChange(of: viewModel.searchText) {
             viewModel.onSearchChanged()
         }
         .onAppear {
