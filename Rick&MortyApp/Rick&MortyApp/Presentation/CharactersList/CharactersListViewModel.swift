@@ -49,6 +49,10 @@ final class CharactersListViewModel: ObservableObject {
         Task { await loadFirstPage() }
     }
     
+    func onRefresh() async {
+        await loadFirstPage()
+    }
+    
     func loadMoreIfNeeded(currentItem: Character?) {
         guard case .loaded(let items) = state else { return }
         guard let currentItem = currentItem else { return }
@@ -68,7 +72,7 @@ final class CharactersListViewModel: ObservableObject {
     
     private func loadNextPage() async {
         guard canLoadMore, !isLoading else { return }
-        await loadPage(reset: true)
+        await loadPage(reset: false)
     }
     
     private func loadPage(reset: Bool) async {

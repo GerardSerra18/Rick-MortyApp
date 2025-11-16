@@ -28,6 +28,7 @@ struct RemoteImageView: View {
             Image(uiImage: image)
                 .resizable()
                 .scaledToFill()
+                .transition(.opacity.animation(.easeIn(duration: 0.25)))
         } else {
             ProgressView()
         }

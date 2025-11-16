@@ -20,8 +20,12 @@ struct CharactersListView: View {
         NavigationStack {
             content
                 .navigationTitle("Characters")
+                .background(Color(.systemGroupedBackground))
         }
         .searchable(text: $viewModel.searchText, prompt: "Search by name")
+        .refreshable {
+            await viewModel.onRefresh()
+        }
         .onChange(of: viewModel.searchText) {
             viewModel.onSearchChanged()
         }
@@ -84,6 +88,7 @@ private extension CharactersListView {
     func listView(items: [Character]) -> some View {
         List {
             statusChips
+                .padding(.vertical, 4)
 
             ForEach(items) { character in
                 NavigationLink {
@@ -96,7 +101,8 @@ private extension CharactersListView {
                 }
             }
         }
-        .listStyle(.plain)
+        .listSectionSpacing(16)
+        .animation(.easeInOut, value: items)
     }
 }
 

@@ -50,22 +50,39 @@ private extension CharacterDetailView {
     func detail(_ character: Character) -> some View {
         ScrollView {
             VStack(spacing: 20) {
-                
-                RemoteImageView(url: character.imageURL, cache: imageCache)
-                    .frame(width: 180, height: 180)
-                    .clipShape(Circle())
-                    .shadow(radius: 8)
-                    .padding(.top, 20)
+                ZStack {
+                    RemoteImageView(url: character.imageURL, cache: imageCache)
+                        .blur(radius: 25)
+                        .opacity(0.3)
+                        .frame(height: 260)
+                        .clipped()
+                    
+                    RemoteImageView(url: character.imageURL, cache: imageCache)
+                        .frame(width: 200, height: 200)
+                        .clipShape(RoundedRectangle(cornerRadius: 22, style: .continuous))
+                        .shadow(radius: 12)
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 22, style: .continuous)
+                                .stroke(Color.white.opacity(0.5), lineWidth: 1)
+                        )
+                }
+                .frame(height: 260)
+                .padding(.top, -20)
                 
                 Text(character.name)
                     .font(.largeTitle.bold())
                 
                 statusPill(character.status)
                 
-                infoRow(title: "Species", value: character.species)
-                infoRow(title: "Gender", value: character.gender.rawValue)
-                infoRow(title: "Origin", value: character.originName)
-                infoRow(title: "Location", value: character.locationName)
+                VStack(spacing: 12) {
+                    infoRow(title: "Species", value: character.species)
+                    infoRow(title: "Gender", value: character.gender.rawValue)
+                    infoRow(title: "Origin", value: character.originName)
+                    infoRow(title: "Location", value: character.locationName)
+                }
+                .padding(.horizontal)
+                .padding(.top, 8)
+
                 
                 Spacer()
             }
@@ -95,8 +112,11 @@ private extension CharacterDetailView {
             Text(value)
                 .foregroundColor(.secondary)
         }
+        .padding()
         .frame(maxWidth: .infinity, alignment: .leading)
-        .padding(.vertical, 4)
+        .background(Color(.secondarySystemBackground))
+        .cornerRadius(16)
+        .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
     }
     
     func colorForStatus(_ status: Character.Status) -> Color {
