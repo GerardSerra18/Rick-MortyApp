@@ -28,10 +28,14 @@ final class RickMortyAPIClient: RickMortyAPIClientProtocol {
         let (data, response) = try await URLSession.shared.data(from: components.url!)
         
         guard let http = response as? HTTPURLResponse, (200..<300).contains(http.statusCode) else {
-            throw URLError(.badServerResponse)
+            throw NetworkError.invalidStatusCode
         }
         
-        return try JSONDecoder().decode(CharactersPageDTO.self, from: data)
+        do {
+            return try JSONDecoder().decode(CharactersPageDTO.self, from: data)
+        } catch {
+            throw NetworkError.decoding
+        }
     }
     
     func fetchCharacter(id: Int) async throws -> CharacterDTO {
@@ -40,10 +44,20 @@ final class RickMortyAPIClient: RickMortyAPIClientProtocol {
         let (data, response) = try await URLSession.shared.data(from: url)
         
         guard let http = response as? HTTPURLResponse, (200..<300).contains(http.statusCode) else {
-            throw URLError(.badServerResponse)
+            throw NetworkError.invalidStatusCode
         }
         
-        return try JSONDecoder().decode(CharacterDTO.self, from: data)
+        do {
+            return try JSONDecoder().decode(CharacterDTO.self, from: data)
+        } catch {
+            throw NetworkError.decoding
+        }
     }
     
+}
+
+enum NetworkError: Error {
+    case invalidStatusCode
+    case decoding
+    case noInternet
 }
