@@ -20,8 +20,8 @@ struct CharacterDetailView: View {
     
     var body: some View {
         content
-            .navigationTitle("Details")
             .navigationBarTitleDisplayMode(.inline)
+            .portalBackground()
             .onAppear { viewModel.onAppear() }
     }
 }
@@ -48,46 +48,39 @@ private extension CharacterDetailView {
     }
     
     func detail(_ character: Character) -> some View {
-        ScrollView {
-            VStack(spacing: 20) {
-                ZStack {
-                    RemoteImageView(url: character.imageURL, cache: imageCache)
-                        .blur(radius: 25)
-                        .opacity(0.3)
-                        .frame(height: 260)
-                        .clipped()
-                    
-                    RemoteImageView(url: character.imageURL, cache: imageCache)
-                        .frame(width: 200, height: 200)
-                        .clipShape(RoundedRectangle(cornerRadius: 22, style: .continuous))
-                        .shadow(radius: 12)
-                        .overlay(
-                            RoundedRectangle(cornerRadius: 22, style: .continuous)
-                                .stroke(Color.white.opacity(0.5), lineWidth: 1)
-                        )
-                }
-                .frame(height: 260)
-                .padding(.top, -20)
+        ScrollView(showsIndicators: false) {
+            VStack(spacing: 32) {
+                
+                RemoteImageView(url: character.imageURL, cache: imageCache)
+                    .frame(width: 230, height: 230)
+                    .clipShape(Circle())
+                    .overlay(
+                        Circle()
+                            .stroke(Color.cyan.opacity(0.7), lineWidth: 4)
+                            .shadow(color: .cyan.opacity(1), radius: 18)
+                    )
+                    .shadow(color: .cyan.opacity(0.4), radius: 30)
+                    .padding(.top, 30)
                 
                 Text(character.name)
-                    .font(.largeTitle.bold())
+                    .font(.system(size: 38, weight: .black))
+                    .foregroundColor(.white)
+                    .shadow(color: .cyan.opacity(0.7), radius: 8)
+                    .multilineTextAlignment(.center)
                 
                 statusPill(character.status)
                 
-                VStack(spacing: 12) {
+                VStack(spacing: 20) {
                     infoRow(title: "Species", value: character.species)
                     infoRow(title: "Gender", value: character.gender.rawValue)
                     infoRow(title: "Origin", value: character.originName)
                     infoRow(title: "Location", value: character.locationName)
                 }
-                .padding(.horizontal)
-                .padding(.top, 8)
-
+                .padding(.horizontal, 12)
                 
-                Spacer()
+                Spacer(minLength: 50)
             }
-            .padding(.horizontal)
-            .padding(.bottom, 30)
+            .padding(.bottom, 40)
         }
     }
 }
@@ -96,27 +89,46 @@ private extension CharacterDetailView {
 private extension CharacterDetailView {
     
     func statusPill(_ status: Character.Status) -> some View {
-        Text(status.rawValue)
-            .font(.caption)
-            .padding(.horizontal, 10)
+        let color = colorForStatus(status)
+        
+        return Text(status.rawValue)
+            .font(.caption.bold())
             .padding(.vertical, 6)
-            .background(colorForStatus(status).opacity(0.2))
-            .foregroundColor(colorForStatus(status))
+            .padding(.horizontal, 16)
+            .background(color.opacity(0.22))
+            .foregroundColor(color)
             .clipShape(Capsule())
+            .shadow(color: color.opacity(0.8), radius: 6)
     }
     
     func infoRow(title: String, value: String) -> some View {
-        VStack(alignment: .leading, spacing: 6) {
-            Text(title)
-                .font(.headline)
+        VStack(alignment: .leading, spacing: 8) {
+            
+            Text(title.uppercased())
+                .font(.caption2.bold())
+                .foregroundColor(.cyan.opacity(0.8))
+                .shadow(color: .cyan.opacity(0.5), radius: 4)
+            
             Text(value)
-                .foregroundColor(.secondary)
+                .font(.headline)
+                .foregroundColor(.white)
+                .shadow(color: .black.opacity(0.4), radius: 2)
         }
-        .padding()
+        .padding(18)
         .frame(maxWidth: .infinity, alignment: .leading)
-        .background(Color(.secondarySystemBackground))
-        .cornerRadius(16)
-        .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
+        .background(
+            RoundedRectangle(cornerRadius: 20)
+                .fill(Color(hex: "11162A").opacity(0.85))
+                .overlay(
+                    RoundedRectangle(cornerRadius: 20)
+                        .stroke(Color.cyan.opacity(0.35), lineWidth: 1.3)
+                )
+                .shadow(
+                    color: Color.cyan.opacity(0.25),
+                    radius: 10, x: 0, y: 4
+                )
+        )
+        .padding(.horizontal, 3)
     }
     
     func colorForStatus(_ status: Character.Status) -> Color {

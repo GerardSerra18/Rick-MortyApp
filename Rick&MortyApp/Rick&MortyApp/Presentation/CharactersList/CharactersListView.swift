@@ -19,10 +19,16 @@ struct CharactersListView: View {
     var body: some View {
         NavigationStack {
             content
-                .navigationTitle("Characters")
-                .background(Color(.systemGroupedBackground))
+                .navigationBarTitleDisplayMode(.inline)
+                .toolbar {
+                    ToolbarItem(placement: .principal) {
+                        Text("Characters")
+                            .font(.headline.bold())
+                            .foregroundColor(.white)
+                    }
+                }
+                .portalBackground()
         }
-        .searchable(text: $viewModel.searchText, prompt: "Search by name")
         .refreshable {
             await viewModel.onRefresh()
         }
@@ -36,21 +42,33 @@ struct CharactersListView: View {
 }
 
 private extension CharactersListView {
-
+    
     @ViewBuilder
     var content: some View {
-        switch viewModel.state {
-        case .loading:
-            loadingView
-
-        case .error(let msg):
-            errorView(message: msg)
-
-        case .empty:
-            emptyView
-
-        case .loaded(let items):
-            listView(items: items)
+        ScrollView {
+            VStack(spacing: 20) {
+                
+                SearchBar(text: $viewModel.searchText)
+                    .padding(.top, 4)
+                
+                statusChips
+                    .padding(.horizontal)
+                
+                switch viewModel.state {
+                case .loading:
+                    loadingView
+                    
+                case .error(let msg):
+                    errorView(message: msg)
+                    
+                case .empty:
+                    emptyView
+                    
+                case .loaded(let items):
+                    listView(items: items)
+                }
+            }
+            .padding(.horizontal)
         }
     }
 }
@@ -86,23 +104,25 @@ private extension CharactersListView {
     }
 
     func listView(items: [Character]) -> some View {
-        List {
-            statusChips
-                .padding(.vertical, 4)
-
+        LazyVGrid(
+            columns: [
+                GridItem(.flexible(), spacing: 16),
+                GridItem(.flexible(), spacing: 16)
+            ],
+            spacing: 18
+        ) {
             ForEach(items) { character in
                 NavigationLink {
                     CharacterDetailView(characterID: character.id)
                 } label: {
-                    CharacterRow(character: character, cache: imageCache)
-                        .onAppear {
-                            viewModel.loadMoreIfNeeded(currentItem: character)
-                        }
+                    CharacterCard(character: character, cache: imageCache)
+                }
+                .buttonStyle(.plain)
+                .onAppear {
+                    viewModel.loadMoreIfNeeded(currentItem: character)
                 }
             }
         }
-        .listSectionSpacing(16)
-        .animation(.easeInOut, value: items)
     }
 }
 
@@ -123,19 +143,40 @@ private extension CharactersListView {
                     }
                 }
             }
-            .padding(.vertical, 6)
+            .padding(.horizontal)
+            .scrollIndicators(.hidden)
         }
     }
     
     func chip(title: String, selected: Bool, action: @escaping () -> Void) -> some View {
-        Button(action: action) {
+
+        let baseColor: Color = {
+            switch title.lowercased() {
+            case "alive": return .green
+            case "dead": return .red
+            case "unknown": return .gray
+            default: return .cyan
+            }
+        }()
+
+        let glow = selected ? baseColor : baseColor.opacity(0.45)
+
+        return Button(action: action) {
             Text(title)
-                .font(.caption)
-                .padding(.horizontal, 10)
-                .padding(.vertical, 6)
-                .background(selected ? Color.blue.opacity(0.2) : Color.gray.opacity(0.15))
-                .foregroundColor(selected ? .blue : .primary)
-                .clipShape(Capsule())
+                .font(.caption.bold())
+                .padding(.horizontal, 14)
+                .padding(.vertical, 8)
+                .foregroundColor(glow)
+                .background(
+                    Capsule()
+                        .fill(Color(hex: "141B33").opacity(0.9))
+                        .overlay(
+                            Capsule()
+                                .stroke(glow.opacity(0.65), lineWidth: selected ? 2 : 1)
+                                .shadow(color: glow.opacity(0.8), radius: selected ? 6 : 2)
+                        )
+                )
+                .animation(.easeOut(duration: 0.2), value: selected)
         }
     }
 }
