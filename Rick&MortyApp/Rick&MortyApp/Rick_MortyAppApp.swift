@@ -9,9 +9,12 @@ import SwiftUI
 
 @main
 struct Rick_MortyAppApp: App {
+    
+    private let repo: CharactersRepositoryProtocol = CharactersRepository(apiClient: RickMortyAPIClient())
+    
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            CharactersListView(viewModel: CharactersListViewModel(repo: repo))
         }
     }
 }
