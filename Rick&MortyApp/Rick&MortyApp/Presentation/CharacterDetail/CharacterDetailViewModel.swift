@@ -36,8 +36,10 @@ final class CharacterDetailViewModel: ObservableObject {
         do {
             let character = try await repository.getCharacter(id: characterID)
             state = .loaded(character)
+        } catch let error as NetworkError {
+            state = .error(error.errorDescription ?? "Unknown error")
         } catch {
-            state = .error("Error loading character")
+            state = .error("Unexpected error")
         }
     }
 }

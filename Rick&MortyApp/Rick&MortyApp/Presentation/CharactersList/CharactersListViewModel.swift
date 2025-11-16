@@ -98,8 +98,10 @@ final class CharactersListViewModel: ObservableObject {
                 canLoadMore = false
             }
             
+        } catch let error as NetworkError {
+            state = .error(error.errorDescription ?? "Unknown error")
         } catch {
-            state = .error("Error loading characters")
+            state = .error("Unexpected error")
         }
         
         isLoading = false
