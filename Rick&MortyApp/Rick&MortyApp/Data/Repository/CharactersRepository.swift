@@ -39,4 +39,15 @@ final class CharactersRepository: CharactersRepositoryProtocol {
     private func buildCacheKey(page: Int, filters: CharactersFilter) -> String {
         "page=\(page)&name=\(filters.name ?? "")&status=\(filters.status?.rawValue ?? "")"
     }
+    
+    func getEpisodes(urls: [String]) async throws -> [Episode] {
+        var episodes: [Episode] = []
+
+        for url in urls {
+            let dto = try await apiClient.fetchEpisode(url: url)
+            episodes.append(Episode(dto: dto))
+        }
+
+        return episodes.sorted { $0.id < $1.id }
+    }
 }

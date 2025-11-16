@@ -10,4 +10,5 @@ import Foundation
 protocol RickMortyAPIClientProtocol {
     func fetchCharacters(page: Int, name: String?, status: String?) async throws -> CharactersPageDTO
     func fetchCharacter(id: Int) async throws -> CharacterDTO
+    func fetchEpisode(url: String) async throws -> EpisodeDTO
 }

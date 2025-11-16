@@ -44,12 +44,12 @@ private extension CharacterDetailView {
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
             
-        case .loaded(let character):
-            detail(character)
+        case .loaded(let character, let episodes):
+            detail(character, episodes)
         }
     }
     
-    func detail(_ character: Character) -> some View {
+    func detail(_ character: Character, _ episodes: [Episode]) -> some View {
         ScrollView(showsIndicators: false) {
             VStack(spacing: 32) {
                 
@@ -80,10 +80,57 @@ private extension CharacterDetailView {
                 }
                 .padding(.horizontal, 12)
                 
+                episodeSection(episodes)
+                    .padding(.top, 10)
+
+                
                 Spacer(minLength: 50)
             }
             .padding(.bottom, 40)
         }
+    }
+    
+    func episodeSection(_ episodes: [Episode]) -> some View {
+        VStack(alignment: .leading, spacing: 12) {
+
+            Text("Episodes")
+                .font(.title3.bold())
+                .foregroundColor(.white)
+                .shadow(color: .cyan.opacity(0.6), radius: 6)
+
+            ScrollView(.horizontal, showsIndicators: false) {
+                HStack(spacing: 14) {
+                    ForEach(episodes) { ep in
+                        episodeCard(ep)
+                    }
+                }
+            }
+        }
+        .padding(.horizontal, 12)
+    }
+
+    func episodeCard(_ episode: Episode) -> some View {
+        VStack(alignment: .leading, spacing: 6) {
+            Text(episode.code)
+                .font(.caption.bold())
+                .foregroundColor(.cyan)
+
+            Text(episode.name)
+                .font(.footnote)
+                .foregroundColor(.white)
+                .frame(maxWidth: 160, alignment: .leading)
+                .multilineTextAlignment(.leading)
+        }
+        .padding(14)
+        .background(
+            RoundedRectangle(cornerRadius: 14)
+                .fill(Color(hex: "10162A").opacity(0.9))
+                .overlay(
+                    RoundedRectangle(cornerRadius: 14)
+                        .stroke(Color.cyan.opacity(0.4), lineWidth: 1)
+                )
+        )
+        .shadow(color: .cyan.opacity(0.25), radius: 10)
     }
 }
 

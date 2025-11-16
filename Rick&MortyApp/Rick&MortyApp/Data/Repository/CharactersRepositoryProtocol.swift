@@ -10,4 +10,5 @@ import Foundation
 protocol CharactersRepositoryProtocol {
     func getCharacters(page: Int, filters: CharactersFilter) async throws -> CharactersPage
     func getCharacter(id: Int) async throws -> Character
+    func getEpisodes(urls: [String]) async throws -> [Episode]
 }

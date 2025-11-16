@@ -16,6 +16,7 @@ struct Character: Identifiable, Equatable {
     let imageURL: URL?
     let originName: String
     let locationName: String
+    let episodeURLs: [String]
 
     enum Status: String {
         case alive = "Alive"
@@ -39,8 +40,8 @@ extension Character {
         self.imageURL = URL(string: dto.image)
         self.originName = dto.origin.name
         self.locationName = dto.location.name
-
         self.status = Character.Status(rawValue: dto.status) ?? .unknown
         self.gender = Character.Gender(rawValue: dto.gender) ?? .unknown
+        self.episodeURLs = dto.episode
     }
 }

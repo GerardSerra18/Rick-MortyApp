@@ -97,6 +97,32 @@ final class RickMortyAPIClient: RickMortyAPIClientProtocol {
         }
     }
     
+    func fetchEpisode(url: String) async throws -> EpisodeDTO {
+        guard let episodeURL = URL(string: url) else { throw NetworkError.invalidURL }
+        
+        do {
+            let (data, response) = try await URLSession.shared.data(from: episodeURL)
+            
+            guard let http = response as? HTTPURLResponse else {
+                throw NetworkError.unknown
+            }
+            
+            switch http.statusCode {
+            case 200..<300: break
+            case 404: throw NetworkError.notFound
+            default: throw NetworkError.invalidStatusCode(http.statusCode)
+            }
+            
+            return try JSONDecoder().decode(EpisodeDTO.self, from: data)
+            
+        } catch let error as URLError {
+            switch error.code {
+            case .notConnectedToInternet: throw NetworkError.noInternet
+            case .timedOut: throw NetworkError.timeout
+            default: throw NetworkError.unknown
+            }
+        }
+    }
 }
 
 enum NetworkError: LocalizedError {
@@ -106,6 +132,7 @@ enum NetworkError: LocalizedError {
     case timeout
     case notFound
     case unknown
+    case invalidURL
 
     var errorDescription: String? {
         switch self {
@@ -121,6 +148,8 @@ enum NetworkError: LocalizedError {
             return "Character not found."
         case .unknown:
             return "Unknown error."
+        case .invalidURL:
+            return "Invalid URL"
         }
     }
 }

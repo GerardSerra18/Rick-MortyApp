@@ -22,7 +22,7 @@ final class CharacterDetailViewModel: ObservableObject {
     
     enum State {
         case loading
-        case loaded(Character)
+        case loaded(Character, [Episode])
         case error(String)
     }
     
@@ -35,7 +35,8 @@ final class CharacterDetailViewModel: ObservableObject {
         
         do {
             let character = try await repository.getCharacter(id: characterID)
-            state = .loaded(character)
+            let episodes = try await repository.getEpisodes(urls: character.episodeURLs)
+            state = .loaded(character, episodes)
         } catch let error as NetworkError {
             state = .error(error.errorDescription ?? "Unknown error")
         } catch {
