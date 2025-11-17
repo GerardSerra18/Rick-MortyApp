@@ -11,10 +11,12 @@ final class CharactersRepository: CharactersRepositoryProtocol {
     
     private let apiClient: RickMortyAPIClientProtocol
     private let cache: ResponseCache
+    private let episodesCache: EpisodesCache
     
-    init(apiClient: RickMortyAPIClientProtocol, cache: ResponseCache = ResponseCache()) {
+    init(apiClient: RickMortyAPIClientProtocol, cache: ResponseCache = ResponseCache(), episodesCache: EpisodesCache = EpisodesCache()) {
         self.apiClient = apiClient
         self.cache = cache
+        self.episodesCache = episodesCache
     }
     
     func getCharacters(page: Int, filters: CharactersFilter) async throws -> CharactersPage {
@@ -41,13 +43,32 @@ final class CharactersRepository: CharactersRepositoryProtocol {
     }
     
     func getEpisodes(urls: [String]) async throws -> [Episode] {
-        var episodes: [Episode] = []
-
-        for url in urls {
-            let dto = try await apiClient.fetchEpisode(url: url)
-            episodes.append(Episode(dto: dto))
+        
+        return try await withThrowingTaskGroup(of: Episode.self) { group in
+            
+            for url in urls {
+                group.addTask { [weak self] in
+                    
+                    guard let self = self else { throw NetworkError.unknown }
+                    
+                    if let cached = self.episodesCache.get(for: url) {
+                        return Episode(dto: cached)
+                    }
+                    
+                    let dto = try await self.apiClient.fetchEpisode(url: url)
+                    self.episodesCache.set(dto, for: url)
+                    
+                    return Episode(dto: dto)
+                }
+            }
+            
+            var episodes: [Episode] = []
+            
+            for try await episode in group {
+                episodes.append(episode)
+            }
+            
+            return episodes.sorted { $0.id < $1.id }
         }
-
-        return episodes.sorted { $0.id < $1.id }
     }
 }

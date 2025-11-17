@@ -6,6 +6,8 @@ build/
 *.xcodeproj/xcuserdata/
 *.xcuserdatad
 *.xcsettings
+*.xcuserstate
+*.xcuserdata/
 
 # SwiftPM
 .swiftpm/
