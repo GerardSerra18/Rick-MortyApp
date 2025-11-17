@@ -43,4 +43,14 @@ final class CharacterDetailViewModel: ObservableObject {
             state = .error("Unexpected error")
         }
     }
+    
+    
+    // MARK: - Testing
+    #if DEBUG
+    @MainActor
+    func test_loadCharacter() async {
+        await loadCharacter()
+    }
+    #endif
+
 }

@@ -24,7 +24,7 @@ final class CharactersListViewModel: ObservableObject {
     private var isLoading = false
     
     // MARK: - State Enum
-    enum State {
+    enum State: Equatable {
         case loading
         case loaded([Character])
         case empty
@@ -106,5 +106,13 @@ final class CharactersListViewModel: ObservableObject {
         
         isLoading = false
     }
+    
+    // MARK: - Testing
+    #if DEBUG
+    @MainActor
+    func test_loadCharacters() async {
+        await loadFirstPage()
+    }
+    #endif
     
 }
